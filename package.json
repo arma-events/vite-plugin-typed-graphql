@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-graphql-ts",
+  "name": "@arma-events/vite-plugin-graphql-ts",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
