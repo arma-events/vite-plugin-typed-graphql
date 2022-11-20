@@ -4,6 +4,7 @@
         "downlevelIteration": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
+        "allowSyntheticDefaultImports": true,
         "lib": ["ESNext", "DOM"],
         "moduleResolution": "node"
     },

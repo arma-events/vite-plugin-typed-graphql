@@ -37,6 +37,7 @@
     "@graphql-tools/load": "^7.8.4",
     "@rollup/pluginutils": "^5.0.2",
     "esbuild": "^0.15.13",
+    "fast-glob": "^3.2.12",
     "graphql": "^16.6.0"
   },
   "devDependencies": {
