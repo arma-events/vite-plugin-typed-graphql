@@ -49,10 +49,12 @@ export function graphqlTypescriptPlugin(
         const graphQLFiles = await glob(MINIMATCH_PATTERNS);
 
         await Promise.all(
-            graphQLFiles.map((p) => {
-                const absPath = resolve(p);
+            graphQLFiles.map((relPath) => {
+                const absPath = resolve(relPath);
                 if (absPath === SCHEMA_PATH)
                     return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
+
+                if (!filter(relPath)) return Promise.resolve();
 
                 return writeDeclarations(absPath, SCHEMA);
             })
