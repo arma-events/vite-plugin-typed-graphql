@@ -6,6 +6,7 @@ import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
 import { writeOperationDeclarations, writeSchemaDeclarations } from './declarations';
+import type { DocumentNode } from 'graphql';
 
 const EXT = /\.(gql|graphql)$/;
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
@@ -41,7 +42,15 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
 
     const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
 
-    let SCHEMA = loadSchemaDocument(SCHEMA_PATH);
+    let SCHEMA: DocumentNode;
+    try {
+        SCHEMA = loadSchemaDocument(SCHEMA_PATH);
+    } catch (err) {
+        throw new Error(
+            `Failed to load GraphQL schema at "${SCHEMA_PATH}". Make sure the schema exists and is valid. The following error was thrown:\n\n${err}\n\n`,
+            err
+        );
+    }
 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 
