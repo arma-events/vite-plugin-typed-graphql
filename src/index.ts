@@ -1,12 +1,12 @@
 import type { Plugin } from 'vite';
 import { createFilter } from '@rollup/pluginutils';
 import { resolve } from 'path';
+import glob from 'fast-glob';
 
 import { loadDocuments } from '@graphql-tools/load';
-import { resetCaches } from 'graphql-tag';
+import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
-import { writeDeclarations, writeSchemaDeclarations } from './declarations';
-import glob from 'fast-glob';
+import { writeOperationDeclarations, writeSchemaDeclarations } from './declarations';
 
 const EXT = /\.(gql|graphql)$/;
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
@@ -49,7 +49,7 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
 
                 if (!filter(relPath)) return Promise.resolve();
 
-                return writeDeclarations(absPath, SCHEMA);
+                return writeOperationDeclarations(absPath, SCHEMA);
             })
         );
     }
@@ -67,7 +67,7 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
 
             TRANSFORMED_GRAPHQL_FILES.add(id);
 
-            resetCaches();
+            resetGQLTagCaches();
 
             const [doc] = await loadDocuments(src, { loaders: [] });
 
@@ -80,13 +80,16 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
         },
 
         async handleHotUpdate({ file: id, server }) {
-            // Handle changes to schema.
-            //
-            // Invalidate all transformed GraphQL files and reload
-            // the server to make sure their transform hook run again.
-            //
-            // See vitejs/vite#7024 - https://github.com/vitejs/vite/issues/7024
-            if (id === SCHEMA_PATH) {
+            const absPath = resolve(id);
+
+            if (absPath === SCHEMA_PATH) {
+                // Handle changes to schema.
+                //
+                // Invalidate all transformed GraphQL files and reload
+                // the server to make sure their transform hook run again.
+                //
+                // See vitejs/vite#7024 - https://github.com/vitejs/vite/issues/7024
+
                 SCHEMA = loadSchemaDocument(SCHEMA_PATH);
 
                 for (const id of TRANSFORMED_GRAPHQL_FILES) {
@@ -109,7 +112,7 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
             if (!EXT.test(id)) return;
             if (!filter(id)) return;
 
-            await writeDeclarations(resolve(id), SCHEMA);
+            await writeOperationDeclarations(absPath, SCHEMA);
         }
     };
 }

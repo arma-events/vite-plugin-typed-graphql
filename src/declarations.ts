@@ -4,10 +4,19 @@ import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
 import { readFile } from 'fs/promises';
 
-export async function writeDeclarations(absPath: string, schema: DocumentNode) {
-    const src = await readFile(absPath, 'utf-8');
+/**
+ * Write type declarations file (`.d.ts`) for GraphQL operation file.
+ *
+ * This will only work for GraphQL operations. Use {@link writeSchemaDeclarations} instead
+ * if you want to write type declarations for a GraphQL schema.
+ *
+ * @param absPath Absolute path to GraphQL file
+ * @param schema GraphQL Schema
+ */
+export async function writeOperationDeclarations(absPath: string, schema: DocumentNode) {
+    const operationSrc = await readFile(absPath, 'utf-8');
 
-    const [doc] = await loadDocuments(src, { loaders: [] });
+    const [doc] = await loadDocuments(operationSrc, { loaders: [] });
 
     const typeScript = await codegenTypedDocumentNode(schema, doc, {
         operation: true,
@@ -15,17 +24,24 @@ export async function writeDeclarations(absPath: string, schema: DocumentNode) {
         typedDocNode: true
     });
 
-    await writeFile(absPath + '.d.ts', '/* eslint-disable */\n\n' + typeScript, {
-        encoding: 'utf-8'
-    });
+    const contents = '/* eslint-disable */\n\n' + typeScript;
+
+    await writeFile(absPath + '.d.ts', contents, { encoding: 'utf-8' });
 }
 
+/**
+ * Write type declarations file (`.d.ts`) for GraphQL schema file.
+ *
+ * This will only work for GraphQL schemas. Use {@link writeOperationDeclarations} instead
+ * if you want to write type declarations for a GraphQL operation.
+ *
+ * @param absPath Absolute path to GraphQL schema file
+ * @param schema GraphQL Schema
+ */
 export async function writeSchemaDeclarations(absPath: string, schema: DocumentNode) {
-    const typeScript = await codegenTypedDocumentNode(schema, undefined, {
-        schema: true
-    });
+    const typeScript = await codegenTypedDocumentNode(schema, undefined, { schema: true });
 
-    await writeFile(absPath + '.d.ts', '/* eslint-disable */\n\n' + typeScript, {
-        encoding: 'utf-8'
-    });
+    const contents = '/* eslint-disable */\n\n' + typeScript;
+
+    await writeFile(absPath + '.d.ts', contents, { encoding: 'utf-8' });
 }
