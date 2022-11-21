@@ -27,10 +27,17 @@ interface GraphQLPluginOptions {
      * Path to GraphQL schema file
      */
     schemaPath?: string;
+
+    /**
+     * If `true`, instructs plugin to generate type declaration files next to included `.graphql`
+     * / `.gql` files, to allow for type-safe GraphQL queries / mutations.
+     */
+    generateDeclarations?: boolean;
 }
 
 export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plugin {
     const filter = createFilter(options.include, options.exclude);
+    const generateDeclarations = options.generateDeclarations ?? true;
 
     const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
 
@@ -39,6 +46,8 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 
     async function writeDeclarationsForAllGQLFiles() {
+        if (!generateDeclarations) return;
+
         const graphQLFiles = await glob(MINIMATCH_PATTERNS);
 
         await Promise.all(
@@ -112,7 +121,7 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
             if (!EXT.test(path)) return;
             if (!filter(path)) return;
 
-            await writeOperationDeclarations(path, SCHEMA);
+            if (generateDeclarations) await writeOperationDeclarations(path, SCHEMA);
         }
     };
 }
