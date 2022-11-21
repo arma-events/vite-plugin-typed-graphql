@@ -36,7 +36,7 @@ interface GraphQLPluginOptions {
     generateDeclarations?: boolean;
 }
 
-export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plugin {
+export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): Plugin {
     const filter = createFilter(options.include, options.exclude);
     const generateDeclarations = options.generateDeclarations ?? true;
 
@@ -73,7 +73,7 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
     }
 
     return {
-        name: 'plugin-graphql-ts',
+        name: 'typed-graphql',
         async buildStart() {
             await writeDeclarationsForAllGQLFiles();
         },
