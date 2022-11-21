@@ -4,11 +4,7 @@ import { resolve } from 'path';
 
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches } from 'graphql-tag';
-import {
-    codegenTypedDocumentNode,
-    loadSchemaDocument,
-    typescriptToJavascript
-} from './utils';
+import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
 import { writeDeclarations, writeSchemaDeclarations } from './declarations';
 import glob from 'fast-glob';
 
@@ -34,9 +30,7 @@ interface GraphQLPluginOptions {
     schemaPath?: string;
 }
 
-export function graphqlTypescriptPlugin(
-    options: GraphQLPluginOptions = {}
-): Plugin {
+export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plugin {
     const filter = createFilter(options.include, options.exclude);
 
     const SCHEMA_PATH = resolve(options?.schemaPath ?? './schema.graphql');
@@ -51,8 +45,7 @@ export function graphqlTypescriptPlugin(
         await Promise.all(
             graphQLFiles.map((relPath) => {
                 const absPath = resolve(relPath);
-                if (absPath === SCHEMA_PATH)
-                    return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
+                if (absPath === SCHEMA_PATH) return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
 
                 if (!filter(relPath)) return Promise.resolve();
 
