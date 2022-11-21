@@ -28,7 +28,10 @@ export async function codegenTypedDocumentNode(
 
     const ts = await codegen({
         documents: doc ? [doc] : [],
-        config: {},
+        config: {
+            documentVariableSuffix: '',
+            fragmentVariableSuffix: ''
+        },
         // used by a plugin internally, although the 'typescript' plugin currently
         // returns the string output, rather than writing to a file
         filename: './node_modules/.vite/graphql.ts',
