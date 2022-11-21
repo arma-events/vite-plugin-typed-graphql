@@ -1,6 +1,5 @@
-import type { Plugin } from 'vite';
+import { normalizePath, Plugin } from 'vite';
 import { createFilter } from '@rollup/pluginutils';
-import { resolve } from 'path';
 import glob from 'fast-glob';
 
 import { loadDocuments } from '@graphql-tools/load';
@@ -33,7 +32,7 @@ interface GraphQLPluginOptions {
 export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plugin {
     const filter = createFilter(options.include, options.exclude);
 
-    const SCHEMA_PATH = resolve(options?.schemaPath ?? './schema.graphql');
+    const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
 
     let SCHEMA = loadSchemaDocument(SCHEMA_PATH);
 
@@ -43,13 +42,14 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
         const graphQLFiles = await glob(MINIMATCH_PATTERNS);
 
         await Promise.all(
-            graphQLFiles.map((relPath) => {
-                const absPath = resolve(relPath);
-                if (absPath === SCHEMA_PATH) return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
+            graphQLFiles.map((path) => {
+                path = normalizePath(path);
 
-                if (!filter(relPath)) return Promise.resolve();
+                if (path === SCHEMA_PATH) return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
 
-                return writeOperationDeclarations(absPath, SCHEMA);
+                if (!filter(path)) return Promise.resolve();
+
+                return writeOperationDeclarations(path, SCHEMA);
             })
         );
     }
@@ -79,10 +79,10 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
             };
         },
 
-        async handleHotUpdate({ file: id, server }) {
-            const absPath = resolve(id);
+        async handleHotUpdate({ file: path, server }) {
+            path = normalizePath(path);
 
-            if (absPath === SCHEMA_PATH) {
+            if (path === SCHEMA_PATH) {
                 // Handle changes to schema.
                 //
                 // Invalidate all transformed GraphQL files and reload
@@ -109,10 +109,10 @@ export function graphqlTypescriptPlugin(options: GraphQLPluginOptions = {}): Plu
                 return;
             }
 
-            if (!EXT.test(id)) return;
-            if (!filter(id)) return;
+            if (!EXT.test(path)) return;
+            if (!filter(path)) return;
 
-            await writeOperationDeclarations(absPath, SCHEMA);
+            await writeOperationDeclarations(path, SCHEMA);
         }
     };
 }

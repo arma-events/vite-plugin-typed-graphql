@@ -10,11 +10,11 @@ import { readFile } from 'fs/promises';
  * This will only work for GraphQL operations. Use {@link writeSchemaDeclarations} instead
  * if you want to write type declarations for a GraphQL schema.
  *
- * @param absPath Absolute path to GraphQL file
+ * @param path Path to GraphQL file
  * @param schema GraphQL Schema
  */
-export async function writeOperationDeclarations(absPath: string, schema: DocumentNode) {
-    const operationSrc = await readFile(absPath, 'utf-8');
+export async function writeOperationDeclarations(path: string, schema: DocumentNode) {
+    const operationSrc = await readFile(path, 'utf-8');
 
     const [doc] = await loadDocuments(operationSrc, { loaders: [] });
 
@@ -26,7 +26,7 @@ export async function writeOperationDeclarations(absPath: string, schema: Docume
 
     const contents = '/* eslint-disable */\n\n' + typeScript;
 
-    await writeFile(absPath + '.d.ts', contents, { encoding: 'utf-8' });
+    await writeFile(path + '.d.ts', contents, { encoding: 'utf-8' });
 }
 
 /**
