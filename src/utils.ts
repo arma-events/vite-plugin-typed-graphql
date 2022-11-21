@@ -14,17 +14,17 @@ export function loadSchemaDocument(path: string): DocumentNode {
 export async function codegenTypedDocumentNode(
     schema: DocumentNode,
     doc?: Types.DocumentFile,
-    enablePlugins: {
+    plugins: {
         schema?: boolean;
         operation?: boolean;
         typedDocNode?: boolean;
     } = { schema: true, operation: true, typedDocNode: true }
 ): Promise<string> {
-    const plugins: Types.ConfiguredPlugin[] = [];
+    const configuredPlugins: Types.ConfiguredPlugin[] = [];
 
-    if (enablePlugins.schema) plugins.push({ typescript: {} });
-    if (enablePlugins.operation) plugins.push({ typescriptOperations: {} });
-    if (enablePlugins.typedDocNode) plugins.push({ typedDocumentNode: {} });
+    if (plugins.schema) configuredPlugins.push({ typescript: {} });
+    if (plugins.operation) configuredPlugins.push({ typescriptOperations: {} });
+    if (plugins.typedDocNode) configuredPlugins.push({ typedDocumentNode: {} });
 
     const ts = await codegen({
         documents: doc ? [doc] : [],
@@ -36,7 +36,7 @@ export async function codegenTypedDocumentNode(
         // returns the string output, rather than writing to a file
         filename: './node_modules/.vite/graphql.ts',
         schema,
-        plugins,
+        plugins: configuredPlugins,
         pluginMap: {
             typescript: typescriptPlugin,
             typescriptOperations: typescriptOperationPlugin,
