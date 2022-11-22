@@ -19,7 +19,7 @@
     "email": "derzade@gmail.com"
   },
   "scripts": {
-    "build": "tsup --tsconfig ./tsconfig.json --dts --minify ./src/index.ts",
+    "build": "tsup --tsconfig ./tsconfig.json --dts --minify --format cjs,esm ./src/index.ts",
     "lint": "eslint --ext .js,.ts ./src",
     "fmt": "prettier --write .",
     "prepare": "npm run build"
