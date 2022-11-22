@@ -1,7 +1,7 @@
 {
   "name": "@arma-events/vite-plugin-graphql-ts",
   "version": "1.1.0",
-  "description": "",
+  "description": "Vite Plugin which enables the import of Typed-Document-Nodes directly from `.gql` / `.graphql` files, to allow for type-safe GraphQL implementations.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "typings": "./dist/index.d.ts",
@@ -21,9 +21,17 @@
   "scripts": {
     "build": "tsup --tsconfig ./tsconfig.json --dts --minify ./src/index.ts",
     "lint": "eslint --ext .js,.ts ./src",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "prepare": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "vite",
+    "plugin",
+    "graphql",
+    "gql",
+    "typed",
+    "typescript"
+  ],
   "author": "Jonas Schade <derzade@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
