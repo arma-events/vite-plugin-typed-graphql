@@ -11,7 +11,7 @@ Supplied with a GraphQL schema, it can automatically generate type declarations 
 ## Installation
 Install the package:
 ```
-npm i --save vite-plugin-typed-graphql --save-dev
+npm i --save-dev vite-plugin-typed-graphql
 ```
 
 ## Setup
@@ -38,13 +38,13 @@ npm i --save vite-plugin-typed-graphql --save-dev
 
 ## Options
 
-### `include`
+### `exclude`
 Type: `String` | `Array[...String]`  
 Default: `null`
 
 A [minimatch pattern](https://github.com/isaacs/minimatch), or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
 
-### `exclude`
+### `include`
 Type: `String` | `Array[...String]`  
 Default: `null`
 
