@@ -17,8 +17,13 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+                  cache: 'npm'
+
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --ignore-scripts
 
             - name: Run ESLint
               run: npm run-script lint
@@ -28,8 +33,13 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+                  cache: 'npm'
+
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --ignore-scripts
 
             - name: Run Prettier
               run: npx prettier --check .
@@ -39,8 +49,13 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+                  cache: 'npm'
+
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --ignore-scripts
 
             - name: Build app
               run: npm run-script build
