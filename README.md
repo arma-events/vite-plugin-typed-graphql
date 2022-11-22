@@ -9,55 +9,61 @@ Fundamentally, this plugin allows you to import GraphQL `DocumentNode`s from `.g
 Supplied with a GraphQL schema, it can automatically generate type declarations (`.d.ts`) files alongside all included GraphQL files, to allow type-safe Queries and Mutations.
 
 ## Installation
+
 Install the package:
+
 ```
 npm i --save-dev vite-plugin-typed-graphql
 ```
 
 ## Setup
+
 1. Add the plugin to the Vite config:
-   ```ts
-   // vite.config.ts
 
-   import { defineConfig } from 'vite';
-   import typedGraphQL from 'vite-plugin-typed-graphql';
+    ```ts
+    // vite.config.ts
 
-   export default defineConfig({
-     plugins: [
-       typedGraphQL(/* See below for list of options */) 
-     ],
-   });
-   ```
+    import { defineConfig } from 'vite';
+    import typedGraphQL from 'vite-plugin-typed-graphql';
+
+    export default defineConfig({
+        plugins: [typedGraphQL(/* See below for list of options */)]
+    });
+    ```
+
 2. Create a `schema.graphql` file containing your GraphQL schema in the root directory of your project (the path can be adjusted via the options)
 
 3. Although it is not necessary, we also recommend adding the following lines to your `.gitignore`:
-   ```
-   *.gql.d.ts
-   *.graphql.d.ts
-   ```
+    ```
+    *.gql.d.ts
+    *.graphql.d.ts
+    ```
 
 ## Options
 
 ### `exclude`
+
 Type: `String` | `Array[...String]`  
 Default: `null`
 
 A [minimatch pattern](https://github.com/isaacs/minimatch), or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
 
 ### `include`
+
 Type: `String` | `Array[...String]`  
 Default: `null`
 
 A [minimatch pattern](https://github.com/isaacs/minimatch), or array of patterns, which specifies the files in the build the plugin should operate on. By default all files are targeted.
 
 ### `schemaPath`
+
 Type: `String`  
 Default: `./schema.graphql`
 
 Path to your schema file.
 
-
 ### `generateDeclarations`
+
 Type: `Boolean`  
 Default: `true`
 
