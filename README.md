@@ -8,6 +8,75 @@ Fundamentally, this plugin allows you to import GraphQL `DocumentNode`s from `.g
 
 Supplied with a GraphQL schema, it can automatically generate type declarations (`.d.ts`) files alongside all included GraphQL files, to allow type-safe Queries and Mutations.
 
+## Usage
+
+<details>
+  <summary>schema.graphql</summary>
+
+  ```graphql
+  
+  # [...]
+
+  type User {
+      """
+      The username used to login.
+      """
+      login: String!
+    
+      # [...]
+  }
+
+  type Query {
+      # [...]
+
+      """
+      Lookup a user by login.
+      """
+      user(login: String!): User
+
+      """
+      The currently authenticated user.
+      """
+      viewer: User!
+  }
+  ```
+</details>
+
+<details>
+  <summary>queries.graphql</summary>
+
+  ```graphql
+  query User($username: String!) {
+      user(login: $username) {
+          login
+      }
+  }
+
+  query Viewer {
+      viewer {
+          login
+      }
+  }
+  ```
+</details>
+
+```ts
+import { request } from 'graphql-request';
+import { User, Viewer } from './queries.graphql';
+
+const ENDPOINT = 'https://api.github.com/graphql';
+
+// @ts-expect-error | This will error, because username has to be of type string
+request(ENDPOINT, User, { username: 3 });
+
+const { viewer } = await request(ENDPOINT, Viewer);
+
+// @ts-expect-error | This will error, because unknown_field does not exist on user
+console.log(viewer.unknown_field);
+
+console.log(viewer.login);
+```
+
 ## Installation
 
 Install the package:
