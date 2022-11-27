@@ -46,7 +46,8 @@
     "@rollup/pluginutils": "^5.0.2",
     "esbuild": "^0.15.13",
     "fast-glob": "^3.2.12",
-    "graphql": "^16.6.0"
+    "graphql": "^16.6.0",
+    "ts-morph": "^17.0.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

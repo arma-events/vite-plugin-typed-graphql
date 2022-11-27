@@ -12,21 +12,25 @@ import { readFile } from 'fs/promises';
  *
  * @param path Path to GraphQL file
  * @param schema GraphQL Schema
+ * @param schemaImports Imports from schema file (this will disable codegen for schema file)
+ * @returns Contents of written file
  */
-export async function writeOperationDeclarations(path: string, schema: DocumentNode) {
+export async function writeOperationDeclarations(path: string, schema: DocumentNode, schemaImports = '') {
     const operationSrc = await readFile(path, 'utf-8');
 
     const [doc] = await loadDocuments(operationSrc, { loaders: [] });
 
     const typeScript = await codegenTypedDocumentNode(schema, doc, {
         operation: true,
-        schema: true,
+        schema: schemaImports === '',
         typedDocNode: true
     });
 
-    const contents = '/* eslint-disable */\n\n' + typeScript;
+    const contents = '/* eslint-disable */\n\n' + schemaImports + typeScript;
 
     await writeFile(path + '.d.ts', contents, { encoding: 'utf-8' });
+
+    return contents;
 }
 
 /**
@@ -37,6 +41,7 @@ export async function writeOperationDeclarations(path: string, schema: DocumentN
  *
  * @param absPath Absolute path to GraphQL schema file
  * @param schema GraphQL Schema
+ * @returns Contents of written file
  */
 export async function writeSchemaDeclarations(absPath: string, schema: DocumentNode) {
     const typeScript = await codegenTypedDocumentNode(schema, undefined, { schema: true });
@@ -44,4 +49,6 @@ export async function writeSchemaDeclarations(absPath: string, schema: DocumentN
     const contents = '/* eslint-disable */\n\n' + typeScript;
 
     await writeFile(absPath + '.d.ts', contents, { encoding: 'utf-8' });
+
+    return contents;
 }

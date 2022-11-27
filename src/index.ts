@@ -5,8 +5,10 @@ import glob from 'fast-glob';
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
-import { writeOperationDeclarations } from './declarations';
+import { writeOperationDeclarations, writeSchemaDeclarations } from './declarations';
 import type { DocumentNode } from 'graphql';
+import { relative, dirname } from 'path';
+import { Project } from 'ts-morph';
 
 const EXT = /\.(gql|graphql)$/;
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
@@ -42,10 +44,12 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
     const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
 
+    let SCHEMA_EXPORTS: string[] = [];
     let SCHEMA: DocumentNode;
 
     function loadSchema() {
         SCHEMA = loadSchemaDocument(SCHEMA_PATH);
+        SCHEMA_EXPORTS = [];
     }
 
     try {
@@ -60,11 +64,24 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 
     async function writeDeclarationForFile(path: string) {
-        await writeOperationDeclarations(path, SCHEMA);
+        await writeOperationDeclarations(
+            path,
+            SCHEMA,
+            `import {\n  ${SCHEMA_EXPORTS.join(',\n  ')}\n} from '${relative(dirname(path), SCHEMA_PATH)}';\n`
+        );
     }
 
     async function writeDeclarationsForAllGQLFiles() {
         if (!generateDeclarations) return;
+
+        {
+            const tsDefinitions = await writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
+
+            const project = new Project({ useInMemoryFileSystem: true });
+            const mySchemaFile = project.createSourceFile('schema.ts', tsDefinitions);
+
+            SCHEMA_EXPORTS = Array.from(mySchemaFile.getExportedDeclarations().keys());
+        }
 
         const graphQLFiles = await glob(MINIMATCH_PATTERNS);
 
@@ -72,7 +89,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
             graphQLFiles.map((path) => {
                 path = normalizePath(path);
 
-                if (path === SCHEMA_PATH) return writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
+                if (path === SCHEMA_PATH) return Promise.resolve();
 
                 if (!filter(path)) return Promise.resolve();
 
