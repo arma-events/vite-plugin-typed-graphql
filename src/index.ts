@@ -1,4 +1,4 @@
-import { normalizePath, Plugin } from 'vite';
+import { normalizePath, type Plugin } from 'vite';
 import { createFilter } from '@rollup/pluginutils';
 import glob from 'fast-glob';
 
@@ -57,7 +57,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     } catch (err) {
         throw new Error(
             `Failed to load GraphQL schema at "${SCHEMA_PATH}". Make sure the schema exists and is valid. The following error was thrown:\n\n${err}\n\n`,
-            err
+            err instanceof Error ? err : undefined
         );
     }
 
