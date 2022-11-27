@@ -5,7 +5,7 @@ import glob from 'fast-glob';
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
-import { writeOperationDeclarations, writeSchemaDeclarations } from './declarations';
+import { writeOperationDeclarations } from './declarations';
 import type { DocumentNode } from 'graphql';
 
 const EXT = /\.(gql|graphql)$/;
@@ -43,8 +43,13 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
 
     let SCHEMA: DocumentNode;
-    try {
+
+    function loadSchema() {
         SCHEMA = loadSchemaDocument(SCHEMA_PATH);
+    }
+
+    try {
+        loadSchema();
     } catch (err) {
         throw new Error(
             `Failed to load GraphQL schema at "${SCHEMA_PATH}". Make sure the schema exists and is valid. The following error was thrown:\n\n${err}\n\n`,
@@ -53,6 +58,10 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     }
 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
+
+    async function writeDeclarationForFile(path: string) {
+        await writeOperationDeclarations(path, SCHEMA);
+    }
 
     async function writeDeclarationsForAllGQLFiles() {
         if (!generateDeclarations) return;
@@ -67,7 +76,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
                 if (!filter(path)) return Promise.resolve();
 
-                return writeOperationDeclarations(path, SCHEMA);
+                return writeDeclarationForFile(path);
             })
         );
     }
@@ -108,7 +117,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
                 //
                 // See vitejs/vite#7024 - https://github.com/vitejs/vite/issues/7024
 
-                SCHEMA = loadSchemaDocument(SCHEMA_PATH);
+                loadSchema();
 
                 for (const id of TRANSFORMED_GRAPHQL_FILES) {
                     const mod = server.moduleGraph.getModuleById(id);
@@ -130,7 +139,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
             if (!EXT.test(path)) return;
             if (!filter(path)) return;
 
-            if (generateDeclarations) await writeOperationDeclarations(path, SCHEMA);
+            if (generateDeclarations) await writeDeclarationForFile(path);
         }
     };
 }
