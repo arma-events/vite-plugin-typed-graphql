@@ -100,6 +100,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
     return {
         name: 'typed-graphql',
+        enforce: 'pre',
         async buildStart() {
             await writeDeclarationsForAllGQLFiles();
         },
