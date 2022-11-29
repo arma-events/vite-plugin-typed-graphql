@@ -1,17 +1,12 @@
-import { normalizePath, type Plugin } from 'vite';
-import { createFilter } from '@rollup/pluginutils';
-import glob from 'fast-glob';
+import { normalizePath, createFilter, type Plugin } from 'vite';
 
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
-import { writeOperationDeclarations, writeSchemaDeclarations } from './declarations';
 import type { DocumentNode } from 'graphql';
-import { relative, dirname } from 'path';
-import { Project } from 'ts-morph';
+import { DeclarationWriter } from './declarations_writer';
 
 const EXT = /\.(gql|graphql)$/;
-const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
 interface GraphQLPluginOptions {
     /**
@@ -43,17 +38,16 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     const generateDeclarations = options.generateDeclarations ?? true;
 
     const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
-
-    let SCHEMA_EXPORTS: string[] = [];
     let SCHEMA: DocumentNode;
 
     function loadSchema() {
         SCHEMA = loadSchemaDocument(SCHEMA_PATH);
-        SCHEMA_EXPORTS = [];
+
+        return SCHEMA;
     }
 
     try {
-        loadSchema();
+        SCHEMA = loadSchema();
     } catch (err) {
         throw new Error(
             `Failed to load GraphQL schema at "${SCHEMA_PATH}". Make sure the schema exists and is valid. The following error was thrown:\n\n${err}\n\n`,
@@ -61,48 +55,15 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
         );
     }
 
+    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter);
+
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
-
-    async function writeDeclarationForFile(path: string) {
-        await writeOperationDeclarations(
-            path,
-            SCHEMA,
-            `import {\n  ${SCHEMA_EXPORTS.join(',\n  ')}\n} from '${relative(dirname(path), SCHEMA_PATH)}';\n`
-        );
-    }
-
-    async function writeDeclarationsForAllGQLFiles() {
-        if (!generateDeclarations) return;
-
-        {
-            const tsDefinitions = await writeSchemaDeclarations(SCHEMA_PATH, SCHEMA);
-
-            const project = new Project({ useInMemoryFileSystem: true });
-            const mySchemaFile = project.createSourceFile('schema.ts', tsDefinitions);
-
-            SCHEMA_EXPORTS = Array.from(mySchemaFile.getExportedDeclarations().keys());
-        }
-
-        const graphQLFiles = await glob(MINIMATCH_PATTERNS);
-
-        await Promise.all(
-            graphQLFiles.map((path) => {
-                path = normalizePath(path);
-
-                if (path === SCHEMA_PATH) return Promise.resolve();
-
-                if (!filter(path)) return Promise.resolve();
-
-                return writeDeclarationForFile(path);
-            })
-        );
-    }
 
     return {
         name: 'typed-graphql',
         enforce: 'pre',
         async buildStart() {
-            await writeDeclarationsForAllGQLFiles();
+            await WRITER.writeDeclarationsForAllGQLFiles();
         },
         async transform(src, id) {
             if (!EXT.test(id)) return null;
@@ -145,7 +106,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
                 TRANSFORMED_GRAPHQL_FILES.clear();
 
-                await writeDeclarationsForAllGQLFiles();
+                await WRITER.writeDeclarationsForAllGQLFiles();
 
                 server.ws.send({
                     type: 'full-reload',
@@ -157,7 +118,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
             if (!EXT.test(path)) return;
             if (!filter(path)) return;
 
-            if (generateDeclarations) await writeDeclarationForFile(path);
+            if (generateDeclarations) await WRITER.writeOperationDeclarations(path);
         }
     };
 }
