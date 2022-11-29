@@ -102,7 +102,19 @@ npm i --save-dev vite-plugin-typed-graphql
 
 2. Create a `schema.graphql` file containing your GraphQL schema in the root directory of your project (the path can be adjusted via the options)
 
-3. Although it is not necessary, we also recommend adding the following lines to your `.gitignore`:
+3. Check your `package.json` build script. If `tsc` (or `vue-tsc`) is run before `vite build` you have to make sure `build-gql-declarations` runs before `tsc`.  
+    
+    For example in a `vanilla-ts` project:
+    ```patch
+       "scripts": {
+         "dev": "vite",
+    -    "build": "tsc && vite build",
+    +    "build": "build-gql-declarations && tsc && vite build",
+         "preview": "vite preview"
+       },
+    ```
+
+4. Although it is not necessary, we also recommend adding the following lines to your `.gitignore`:
     ```
     *.gql.d.ts
     *.graphql.d.ts
