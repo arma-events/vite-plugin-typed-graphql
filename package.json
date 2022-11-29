@@ -13,6 +13,9 @@
       "require": "./dist/index.cjs"
     }
   },
+  "bin": {
+    "build-gql-declarations": "./dist/build-gql-declarations.cjs"
+  },
   "homepage": "https://github.com/arma-events/vite-plugin-typed-graphql#readme",
   "repository": {
     "type": "git",
@@ -50,7 +53,7 @@
     "@graphql-codegen/typescript": "^2.8.1",
     "@graphql-codegen/typescript-operations": "^2.5.6",
     "@graphql-tools/load": "^7.8.4",
-    "@rollup/pluginutils": "^5.0.2",
+    "commander": "^9.4.1",
     "esbuild": "^0.15.13",
     "fast-glob": "^3.2.12",
     "graphql": "^16.6.0",
