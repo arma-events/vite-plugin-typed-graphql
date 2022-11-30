@@ -104,12 +104,24 @@ npm i --save-dev vite-plugin-typed-graphql
 
 3. Check your `package.json` build script. If `tsc` (or `vue-tsc`) is run before `vite build` you have to make sure `build-gql-declarations` runs before `tsc`.  
     
-    For example in a `vanilla-ts` project:
+    For example in a _Vanilla Typescript_ project:
     ```patch
        "scripts": {
          "dev": "vite",
     -    "build": "tsc && vite build",
     +    "build": "build-gql-declarations && tsc && vite build",
+         "preview": "vite preview"
+       },
+    ```
+
+    or for a _Vue Typescript_ project:
+    ```patch
+       "scripts": {
+         "dev": "vite --host",
+         "build": "run-p type-check build-only",
+         "build-only": "vite build",
+    -    "type-check": "vue-tsc --noEmit",
+    +    "type-check": "build-gql-declarations && vue-tsc --noEmit",
          "preview": "vite preview"
        },
     ```
