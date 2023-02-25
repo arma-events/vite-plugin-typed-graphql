@@ -42,4 +42,9 @@ const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter);
 
 (async () => {
     await WRITER.writeDeclarationsForAllGQLFiles();
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // eslint-disable-next-line no-console
+    console.log('✅ Wrote all GraphQL declarations');
 })();
