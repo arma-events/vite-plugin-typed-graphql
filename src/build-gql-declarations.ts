@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { createFilter, normalizePath } from 'vite';
 import { DeclarationWriter } from './declarations_writer';
 import { loadSchemaDocument } from './utils';
+import { disableFragmentWarnings } from 'graphql-tag';
 
 const program = new Command();
 
@@ -34,6 +35,8 @@ const SCHEMA_PATH = normalizePath(options.schema);
 const SCHEMA = loadSchemaDocument(SCHEMA_PATH);
 
 const filter = createFilter(options.include, options.exclude);
+
+disableFragmentWarnings();
 
 const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter);
 

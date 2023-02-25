@@ -1,13 +1,14 @@
 import { normalizePath, createFilter, type Plugin } from 'vite';
 
 import { loadDocuments } from '@graphql-tools/load';
-import { resetCaches as resetGQLTagCaches } from 'graphql-tag';
+import { resetCaches as resetGQLTagCaches, disableFragmentWarnings } from 'graphql-tag';
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
 import type { DocumentNode } from 'graphql';
 import { DeclarationWriter } from './declarations_writer';
 
 const EXT = /\.(gql|graphql)$/;
 
+disableFragmentWarnings();
 interface GraphQLPluginOptions {
     /**
      * A [picomatch pattern](https://github.com/micromatch/picomatch), or array of patterns, which
