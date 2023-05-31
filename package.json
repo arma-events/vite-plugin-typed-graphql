@@ -45,7 +45,7 @@
   "author": "Jonas Schade <derzade@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
-    "vite": "^3.2.2"
+    "vite": "^4.3.9"
   },
   "dependencies": {
     "@graphql-codegen/core": "^3.1.0",
