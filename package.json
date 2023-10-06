@@ -56,7 +56,7 @@
     "commander": "^10.0.0",
     "esbuild": "^0.17.10",
     "fast-glob": "^3.2.12",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "ts-morph": "^17.0.1"
   },
   "devDependencies": {
