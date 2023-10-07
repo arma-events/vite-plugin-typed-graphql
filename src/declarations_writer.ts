@@ -4,6 +4,7 @@ import glob from 'fast-glob';
 import { dirname, relative } from 'path';
 import { normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
+import { sep } from 'node:path';
 
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
@@ -23,7 +24,7 @@ export class DeclarationWriter {
         await writeOperationDeclarations(
             path,
             this.schema,
-            `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${relative(dirname(path), this.schemaPath)}';\n`
+            `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${relative(dirname(path), this.schemaPath).split(sep).join('/')}';\n`
         );
     }
 
