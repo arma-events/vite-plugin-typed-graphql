@@ -21,10 +21,12 @@ export class DeclarationWriter {
     }
 
     public async writeOperationDeclarations(path: string) {
+        const schemaPath = relative(dirname(path), this.schemaPath).split(sep).join('/');
+
         await writeOperationDeclarations(
             path,
             this.schema,
-            `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${relative(dirname(path), this.schemaPath).split(sep).join('/')}';\n`
+            `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${schemaPath}';\n`
         );
     }
 
