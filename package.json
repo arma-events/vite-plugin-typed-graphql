@@ -14,7 +14,7 @@
     }
   },
   "bin": {
-    "build-gql-declarations": "./dist/build-gql-declarations.cjs"
+    "build-gql-declarations": "./dist/build-gql-declarations.mjs"
   },
   "homepage": "https://github.com/arma-events/vite-plugin-typed-graphql#readme",
   "repository": {
