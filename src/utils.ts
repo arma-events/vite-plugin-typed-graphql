@@ -6,6 +6,7 @@ import { parse, DocumentNode } from 'graphql';
 import { readFileSync } from 'fs';
 import { codegen } from '@graphql-codegen/core';
 import { Types } from '@graphql-codegen/plugin-helpers';
+import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 
 export function loadSchemaDocument(path: string): DocumentNode {
     return parse(readFileSync(path, 'utf-8'));
@@ -18,11 +19,20 @@ export async function codegenTypedDocumentNode(
         schema?: boolean;
         operation?: boolean;
         typedDocNode?: boolean;
-    } = { schema: true, operation: true, typedDocNode: true }
+    } = { schema: true, operation: true, typedDocNode: true },
+    pluginConfigs: {
+        typescript?: TypeScriptPluginConfig;
+    } = {}
 ): Promise<string> {
     const configuredPlugins: Types.ConfiguredPlugin[] = [];
 
-    if (plugins.schema) configuredPlugins.push({ typescript: {} });
+    if (plugins.schema)
+        configuredPlugins.push({
+            typescript: {
+                defaultScalarType: 'unknown',
+                ...pluginConfigs.typescript
+            } satisfies TypeScriptPluginConfig
+        });
     if (plugins.operation) configuredPlugins.push({ typescriptOperations: {} });
     if (plugins.typedDocNode) configuredPlugins.push({ typedDocumentNode: {} });
 

@@ -5,18 +5,26 @@ import { dirname, relative } from 'path';
 import { normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
 import { sep } from 'node:path';
+import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
 export class DeclarationWriter {
     private schema: DocumentNode;
     private schemaPath: string;
+    private codegenTSPluginConfig?: TypeScriptPluginConfig;
     private schemaExports: string[] = [];
     private filter?: (path: string) => boolean = undefined;
 
-    constructor(schemaPath: string, schema: DocumentNode, filter?: (path: string) => boolean) {
+    constructor(
+        schemaPath: string,
+        schema: DocumentNode,
+        filter?: (path: string) => boolean,
+        codegenTSPluginConfig?: TypeScriptPluginConfig
+    ) {
         this.schemaPath = schemaPath;
         this.schema = schema;
+        this.codegenTSPluginConfig = codegenTSPluginConfig;
         this.filter = filter;
     }
 
@@ -31,7 +39,7 @@ export class DeclarationWriter {
     }
 
     public async writeSchemaDeclarations() {
-        const tsDefinitions = await writeSchemaDeclarations(this.schemaPath, this.schema);
+        const tsDefinitions = await writeSchemaDeclarations(this.schemaPath, this.schema, this.codegenTSPluginConfig);
 
         const project = new Project({ useInMemoryFileSystem: true });
         const mySchemaFile = project.createSourceFile('schema.ts', tsDefinitions);

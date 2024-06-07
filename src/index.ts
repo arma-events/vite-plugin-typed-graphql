@@ -5,6 +5,7 @@ import { resetCaches as resetGQLTagCaches, disableFragmentWarnings } from 'graph
 import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } from './utils';
 import type { DocumentNode } from 'graphql';
 import { DeclarationWriter } from './declarations_writer';
+import { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 
 const EXT = /\.(gql|graphql)$/;
 
@@ -32,6 +33,13 @@ export interface GraphQLPluginOptions {
      * / `.gql` files, to allow for type-safe GraphQL queries / mutations.
      */
     generateDeclarations?: boolean;
+
+    /**
+     * Config to pass to the TypeScript codegen plugin
+     *
+     * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference)
+     */
+    codegenTSPluginConfig?: TypeScriptPluginConfig;
 }
 
 export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): Plugin {
@@ -56,7 +64,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
         );
     }
 
-    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter);
+    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter, options.codegenTSPluginConfig);
 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 
