@@ -9,7 +9,7 @@ import { DeclarationWriter } from './declarations_writer';
 const EXT = /\.(gql|graphql)$/;
 
 disableFragmentWarnings();
-interface GraphQLPluginOptions {
+export interface GraphQLPluginOptions {
     /**
      * A [picomatch pattern](https://github.com/micromatch/picomatch), or array of patterns, which
      * specifies the files in the build the plugin should operate on. By default all files are targeted.
@@ -63,6 +63,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     return {
         name: 'typed-graphql',
         enforce: 'pre',
+        api: { options },
         async buildStart() {
             await WRITER.writeDeclarationsForAllGQLFiles();
         },
