@@ -4,6 +4,7 @@ import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
 import { readFile } from 'fs/promises';
 import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 
 /**
  * Write type declarations file (`.d.ts`) for GraphQL operation file.
@@ -17,9 +18,10 @@ import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
  * @returns Contents of written file
  */
 export async function writeOperationDeclarations(path: string, schema: DocumentNode, schemaImports = '') {
-    const operationSrc = await readFile(path, 'utf-8');
+    // const operationSrc = await readFile(path, 'utf-8');
 
-    const [doc] = await loadDocuments(operationSrc, { loaders: [] });
+    // const [doc] = await loadDocuments(operationSrc, { loaders: [] });
+    const [doc] = await loadDocuments(path, { loaders: [new GraphQLFileLoader()] });
 
     const typeScript = await codegenTypedDocumentNode(schema, doc, {
         operation: true,
