@@ -2,34 +2,25 @@ import { writeSchemaDeclarations, writeOperationDeclarations } from './declarati
 import { Project } from 'ts-morph';
 import glob from 'fast-glob';
 import { dirname, relative } from 'path';
-import { normalizePath } from 'vite';
+import { createFilter, normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
 import { sep } from 'node:path';
-import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
-import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
+import type { GraphQLPluginOptions } from '.';
 
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
 export class DeclarationWriter {
     private schema: DocumentNode;
     private schemaPath: string;
-    private codegenTSPluginConfig?: TypeScriptPluginConfig;
-    private codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig;
+    private options: GraphQLPluginOptions;
     private schemaExports: string[] = [];
     private filter?: (path: string) => boolean = undefined;
 
-    constructor(
-        schemaPath: string,
-        schema: DocumentNode,
-        filter?: (path: string) => boolean,
-        codegenTSPluginConfig?: TypeScriptPluginConfig,
-        codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig
-    ) {
+    constructor(schemaPath: string, schema: DocumentNode, options: GraphQLPluginOptions = {}) {
         this.schemaPath = schemaPath;
         this.schema = schema;
-        this.codegenTSPluginConfig = codegenTSPluginConfig;
-        this.codegenTSOperationsPluginConfig = codegenTSOperationsPluginConfig;
-        this.filter = filter;
+        this.options = options;
+        this.filter = createFilter(options.include, options.exclude);
     }
 
     public async writeOperationDeclarations(path: string) {
@@ -38,13 +29,13 @@ export class DeclarationWriter {
         await writeOperationDeclarations(
             path,
             this.schema,
-            this.codegenTSOperationsPluginConfig,
+            this.options,
             `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${schemaPath}';\n`
         );
     }
 
     public async writeSchemaDeclarations() {
-        const tsDefinitions = await writeSchemaDeclarations(this.schemaPath, this.schema, this.codegenTSPluginConfig);
+        const tsDefinitions = await writeSchemaDeclarations(this.schemaPath, this.schema, this.options);
 
         const project = new Project({ useInMemoryFileSystem: true });
         const mySchemaFile = project.createSourceFile('schema.ts', tsDefinitions);

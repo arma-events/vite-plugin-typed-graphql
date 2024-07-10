@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { createFilter, normalizePath, loadConfigFromFile, type PluginOption, type Plugin } from 'vite';
+import { normalizePath, loadConfigFromFile, type PluginOption, type Plugin } from 'vite';
 import { DeclarationWriter } from './declarations_writer';
 import { loadSchemaDocument } from './utils';
 import { disableFragmentWarnings } from 'graphql-tag';
@@ -61,30 +61,29 @@ const program = new Command();
         return plugin?.api?.options ?? null;
     });
 
-    const options = {
-        schema: program.getOptionValue('schema') as string,
+    const args = {
+        schema: program.getOptionValue('schema') as string | undefined,
         include: program.getOptionValue('include') as string[] | undefined,
         exclude: program.getOptionValue('exclude') as string[] | undefined
     };
 
-    if (options.include?.length === 0) options.include = undefined;
-    if (options.exclude?.length === 0) options.exclude = undefined;
+    if (args.include?.length === 0) args.include = undefined;
+    if (args.exclude?.length === 0) args.exclude = undefined;
 
-    const SCHEMA_PATH = normalizePath(options.schema ?? viteOptions?.schemaPath);
+    const options: GraphQLPluginOptions = {
+        ...(viteOptions ?? {}),
+        schemaPath: args.schema ?? viteOptions?.schemaPath,
+        include: args.include ?? viteOptions?.include,
+        exclude: args.exclude ?? viteOptions?.exclude
+    };
+
+    const SCHEMA_PATH = normalizePath(options.schemaPath ?? './schema.graphql');
 
     const SCHEMA = loadSchemaDocument(SCHEMA_PATH);
 
-    const filter = createFilter(options.include ?? viteOptions?.include, options.exclude ?? viteOptions?.exclude);
-
     disableFragmentWarnings();
 
-    const WRITER = new DeclarationWriter(
-        SCHEMA_PATH,
-        SCHEMA,
-        filter,
-        viteOptions?.codegenTSPluginConfig,
-        viteOptions?.codegenTSOperationsPluginConfig
-    );
+    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, options);
 
     await WRITER.writeDeclarationsForAllGQLFiles();
 

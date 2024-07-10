@@ -8,9 +8,32 @@ import { codegen } from '@graphql-codegen/core';
 import { Types } from '@graphql-codegen/plugin-helpers';
 import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
+import type { GraphQLPluginOptions } from '.';
 
 export function loadSchemaDocument(path: string): DocumentNode {
     return parse(readFileSync(path, 'utf-8'));
+}
+
+function makeTsPluginConfig(options: GraphQLPluginOptions): TypeScriptPluginConfig {
+    const config = options.codegenTSPluginConfig;
+
+    return {
+        ...config,
+        defaultScalarType: options.defaultScalarType ?? config?.defaultScalarType ?? 'unknown',
+        strictScalars: options.strictScalars ?? config?.strictScalars ?? false,
+        scalars: options.scalars ?? config?.scalars ?? {}
+    };
+}
+
+function makeTsOperationsPluginConfig(options: GraphQLPluginOptions): TypeScriptDocumentsPluginConfig {
+    const config = options.codegenTSOperationsPluginConfig;
+
+    return {
+        ...config,
+        defaultScalarType: options.defaultScalarType ?? config?.defaultScalarType ?? 'unknown',
+        strictScalars: options.strictScalars ?? config?.strictScalars ?? false,
+        scalars: options.scalars ?? config?.scalars ?? {}
+    };
 }
 
 export async function codegenTypedDocumentNode(
@@ -21,27 +44,12 @@ export async function codegenTypedDocumentNode(
         operation?: boolean;
         typedDocNode?: boolean;
     } = { schema: true, operation: true, typedDocNode: true },
-    pluginConfigs: {
-        typescript?: TypeScriptPluginConfig;
-        operation?: TypeScriptDocumentsPluginConfig;
-    } = {}
+    options: GraphQLPluginOptions = {}
 ): Promise<string> {
     const configuredPlugins: Types.ConfiguredPlugin[] = [];
 
-    if (plugins.schema)
-        configuredPlugins.push({
-            typescript: {
-                defaultScalarType: 'unknown',
-                ...pluginConfigs.typescript
-            } satisfies TypeScriptPluginConfig
-        });
-    if (plugins.operation)
-        configuredPlugins.push({
-            typescriptOperations: {
-                defaultScalarType: 'unknown',
-                ...pluginConfigs.operation
-            } satisfies TypeScriptDocumentsPluginConfig
-        });
+    if (plugins.schema) configuredPlugins.push({ typescript: makeTsPluginConfig(options) });
+    if (plugins.operation) configuredPlugins.push({ typescriptOperations: makeTsOperationsPluginConfig(options) });
     if (plugins.typedDocNode) configuredPlugins.push({ typedDocumentNode: {} });
 
     const ts = await codegen({

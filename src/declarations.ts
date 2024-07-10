@@ -3,8 +3,7 @@ import { loadDocuments } from '@graphql-tools/load';
 import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
 import { readFile } from 'fs/promises';
-import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
-import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
+import { GraphQLPluginOptions } from '.';
 
 /**
  * Write type declarations file (`.d.ts`) for GraphQL operation file.
@@ -14,6 +13,7 @@ import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescrip
  *
  * @param path Path to GraphQL file
  * @param schema GraphQL Schema
+ * @param options Plugin options (will be used to calculate config for codegen plugins)
  * @param schemaImports Imports from schema file (this will disable codegen for schema file)
  * @returns Contents of written file
  */
@@ -21,7 +21,7 @@ import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescrip
 export async function writeOperationDeclarations(
     path: string,
     schema: DocumentNode,
-    codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig,
+    options: GraphQLPluginOptions = {},
     schemaImports = ''
 ) {
     const operationSrc = await readFile(path, 'utf-8');
@@ -36,7 +36,7 @@ export async function writeOperationDeclarations(
             schema: schemaImports === '',
             typedDocNode: true
         },
-        { operation: codegenTSOperationsPluginConfig }
+        options
     );
 
     const contents = '/* eslint-disable */\n\n' + schemaImports + typeScript;
@@ -54,19 +54,15 @@ export async function writeOperationDeclarations(
  *
  * @param absPath Absolute path to GraphQL schema file
  * @param schema GraphQL Schema
+ * @param options Plugin options (will be used to calculate config for codegen plugin options)
  * @returns Contents of written file
  */
 export async function writeSchemaDeclarations(
     absPath: string,
     schema: DocumentNode,
-    codegenTSPluginConfig?: TypeScriptPluginConfig
+    options: GraphQLPluginOptions = {}
 ) {
-    const typeScript = await codegenTypedDocumentNode(
-        schema,
-        undefined,
-        { schema: true },
-        { typescript: codegenTSPluginConfig }
-    );
+    const typeScript = await codegenTypedDocumentNode(schema, undefined, { schema: true }, options);
 
     const contents = '/* eslint-disable */\n\n' + typeScript;
 

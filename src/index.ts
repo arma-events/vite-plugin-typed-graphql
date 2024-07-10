@@ -38,6 +38,8 @@ export interface GraphQLPluginOptions {
     /**
      * Config to pass to the TypeScript codegen plugin
      *
+     * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
+     *
      * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference)
      */
     codegenTSPluginConfig?: TypeScriptPluginConfig;
@@ -45,9 +47,48 @@ export interface GraphQLPluginOptions {
     /**
      * Config to pass to the TypeScript operations codegen plugin
      *
+     * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
+     *
      * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference)
      */
     codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig;
+
+    /**
+     * Makes scalars strict.
+     *
+     * If scalars are found in the schema that are not defined in scalars an error will be thrown during codegen.
+     *
+     * @default false
+     */
+    strictScalars?: boolean;
+
+    /**
+     * Allows you to override the type that unknown scalars will have.
+     *
+     * @default 'unknown'
+     */
+    defaultScalarType?: string;
+
+    /**
+     * Extend or override the built-in scalars and custom GraphQL scalars to a custom type.
+     *
+     * @example
+     * {
+     *     UUID: 'string',
+     *     DateTime: {
+     *         input: 'Date | string',
+     *         output: 'string'
+     *     },
+     * }
+     */
+    scalars?: {
+        [name: string]:
+            | string
+            | {
+                  input: string;
+                  output: string;
+              };
+    };
 }
 
 export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): Plugin {
@@ -72,13 +113,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
         );
     }
 
-    const WRITER = new DeclarationWriter(
-        SCHEMA_PATH,
-        SCHEMA,
-        filter,
-        options.codegenTSPluginConfig,
-        options.codegenTSOperationsPluginConfig
-    );
+    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, options);
 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 
