@@ -1,8 +1,8 @@
 import type { DocumentNode } from 'graphql';
 import { loadDocuments } from '@graphql-tools/load';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
-import { readFile } from 'fs/promises';
 import { GraphQLPluginOptions } from '.';
 
 /**
@@ -24,9 +24,7 @@ export async function writeOperationDeclarations(
     options: GraphQLPluginOptions = {},
     schemaImports = ''
 ) {
-    const operationSrc = await readFile(path, 'utf-8');
-
-    const [doc] = await loadDocuments(operationSrc, { loaders: [] });
+    const [doc] = await loadDocuments(path, { loaders: [new GraphQLFileLoader()] });
 
     const typeScript = await codegenTypedDocumentNode(
         schema,

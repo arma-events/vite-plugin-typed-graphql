@@ -8,6 +8,7 @@ import type { DocumentNode } from 'graphql';
 import { DeclarationWriter } from './declarations_writer';
 import { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 
 const EXT = /\.(gql|graphql)$/;
 
@@ -134,7 +135,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
             resetGQLTagCaches();
 
-            const [doc] = await loadDocuments(src, { loaders: [] });
+            const [doc] = await loadDocuments(id, { loaders: [new GraphQLFileLoader()] });
 
             return {
                 code: await codegenTypedDocumentNode(SCHEMA, doc, {
