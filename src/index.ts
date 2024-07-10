@@ -9,6 +9,7 @@ import { DeclarationWriter } from './declarations_writer';
 import { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
 import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { extractImportLines, parseImportLine } from '@graphql-tools/import';
 
 const EXT = /\.(gql|graphql)$/;
 
@@ -134,6 +135,18 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
             TRANSFORMED_GRAPHQL_FILES.add(id);
 
             resetGQLTagCaches();
+
+            const { importLines } = extractImportLines(src);
+
+            await Promise.all(
+                importLines.map(async (line) => {
+                    let { from } = parseImportLine(line.replace(/^#/, '').trim());
+                    from = from.startsWith('./') || from.startsWith('/') ? from : `./${from}`;
+                    const importId = await this.resolve(from, id);
+                    if (importId === null) return;
+                    this.addWatchFile(importId.id);
+                })
+            );
 
             const [doc] = await loadDocuments(id, { loaders: [new GraphQLFileLoader()] });
 
