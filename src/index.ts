@@ -57,7 +57,7 @@ export interface GraphQLPluginOptions {
     /**
      * Makes scalars strict.
      *
-     * If scalars are found in the schema that are not defined in scalars an error will be thrown during codegen.
+     * If scalars are found in the schema that are not defined in {@link scalars} an error will be thrown during codegen.
      *
      * @default false
      */

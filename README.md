@@ -163,7 +163,7 @@ Default: `true`
 If `true`, instructs plugin to generate type declaration files next to included `.graphql` / `.gql` files, to allow for type-safe GraphQL queries / mutations.
 
 
-### `codegenTSPluginConfig`
+### `codegenPluginConfigs`
 
 Type: `Object` (see [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference))  
 Default: `{}`
@@ -172,11 +172,49 @@ Config to pass to the typescript plugin of GraphQL codegen.
 This allows you to set options like [TS types for scalars](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars).
 See [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference) for a detailed list of options.
 
-### `codegenTSOperationsPluginConfig`
+### `strictScalars`
 
-Type: `Object` (see [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference))  
+Type: `Boolean`  
+Default: `false`
+
+Makes scalars strict.
+
+If scalars are found in the schema that are not defined in [scalars](#scalars) an error will be thrown during codegen.
+
+### `defaultScalarType`
+
+Type: `String`  
+Default: `'unknown'`
+
+Allows you to override the type that unknown scalars will have.
+
+### `scalars`
+
+Type: `{ [name: string]: string | { input: string, output: string } }`  
 Default: `{}`
 
-Config to pass to the typescript operations plugin of GraphQL codegen.  
-This allows you to set options like [TS types for scalars](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#scalars).
-See [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference) for a detailed list of options.
+Extend or override the built-in scalars and custom GraphQL scalars to a custom type.
+
+Example:
+```ts
+{
+    UUID: 'string',
+    DateTime: {
+        input: 'Date | string',
+        output: 'string'
+    },
+}
+```
+
+
+### `codegenPluginConfigs`
+
+Type: `Object`  
+Default: `{}`
+
+Configs to pass to the GraphQL-Codegen plugins. Has to properties:
+- `typescript` for typescript plugin config (see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference))
+- `typescriptOperations` for TypeScript operations plugin (see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference))
+
+> [!NOTE]
+> `strictScalars`, `defaultScalarType`, and `scalars` in both `typescript` and `typescriptOperations` configs will be overridden by the options in this plugin.
