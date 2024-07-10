@@ -4,6 +4,7 @@ import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
 import { readFile } from 'fs/promises';
 import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
+import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
 
 /**
  * Write type declarations file (`.d.ts`) for GraphQL operation file.
@@ -16,16 +17,27 @@ import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
  * @param schemaImports Imports from schema file (this will disable codegen for schema file)
  * @returns Contents of written file
  */
-export async function writeOperationDeclarations(path: string, schema: DocumentNode, schemaImports = '') {
+
+export async function writeOperationDeclarations(
+    path: string,
+    schema: DocumentNode,
+    codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig,
+    schemaImports = ''
+) {
     const operationSrc = await readFile(path, 'utf-8');
 
     const [doc] = await loadDocuments(operationSrc, { loaders: [] });
 
-    const typeScript = await codegenTypedDocumentNode(schema, doc, {
-        operation: true,
-        schema: schemaImports === '',
-        typedDocNode: true
-    });
+    const typeScript = await codegenTypedDocumentNode(
+        schema,
+        doc,
+        {
+            operation: true,
+            schema: schemaImports === '',
+            typedDocNode: true
+        },
+        { operation: codegenTSOperationsPluginConfig }
+    );
 
     const contents = '/* eslint-disable */\n\n' + schemaImports + typeScript;
 

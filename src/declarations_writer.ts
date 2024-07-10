@@ -6,6 +6,7 @@ import { normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
 import { sep } from 'node:path';
 import type { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
+import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
 
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
@@ -13,6 +14,7 @@ export class DeclarationWriter {
     private schema: DocumentNode;
     private schemaPath: string;
     private codegenTSPluginConfig?: TypeScriptPluginConfig;
+    private codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig;
     private schemaExports: string[] = [];
     private filter?: (path: string) => boolean = undefined;
 
@@ -20,11 +22,13 @@ export class DeclarationWriter {
         schemaPath: string,
         schema: DocumentNode,
         filter?: (path: string) => boolean,
-        codegenTSPluginConfig?: TypeScriptPluginConfig
+        codegenTSPluginConfig?: TypeScriptPluginConfig,
+        codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig
     ) {
         this.schemaPath = schemaPath;
         this.schema = schema;
         this.codegenTSPluginConfig = codegenTSPluginConfig;
+        this.codegenTSOperationsPluginConfig = codegenTSOperationsPluginConfig;
         this.filter = filter;
     }
 
@@ -34,6 +38,7 @@ export class DeclarationWriter {
         await writeOperationDeclarations(
             path,
             this.schema,
+            this.codegenTSOperationsPluginConfig,
             `import {\n  ${this.schemaExports.join(',\n  ')}\n} from '${schemaPath}';\n`
         );
     }

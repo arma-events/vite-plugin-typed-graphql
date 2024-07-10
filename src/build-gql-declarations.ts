@@ -78,7 +78,13 @@ const program = new Command();
 
     disableFragmentWarnings();
 
-    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter, viteOptions?.codegenTSPluginConfig);
+    const WRITER = new DeclarationWriter(
+        SCHEMA_PATH,
+        SCHEMA,
+        filter,
+        viteOptions?.codegenTSPluginConfig,
+        viteOptions?.codegenTSOperationsPluginConfig
+    );
 
     await WRITER.writeDeclarationsForAllGQLFiles();
 

@@ -6,6 +6,7 @@ import { codegenTypedDocumentNode, loadSchemaDocument, typescriptToJavascript } 
 import type { DocumentNode } from 'graphql';
 import { DeclarationWriter } from './declarations_writer';
 import { TypeScriptPluginConfig } from '@graphql-codegen/typescript';
+import type { TypeScriptDocumentsPluginConfig } from '@graphql-codegen/typescript-operations';
 
 const EXT = /\.(gql|graphql)$/;
 
@@ -40,6 +41,13 @@ export interface GraphQLPluginOptions {
      * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference)
      */
     codegenTSPluginConfig?: TypeScriptPluginConfig;
+
+    /**
+     * Config to pass to the TypeScript operations codegen plugin
+     *
+     * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference)
+     */
+    codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig;
 }
 
 export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): Plugin {
@@ -64,7 +72,13 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
         );
     }
 
-    const WRITER = new DeclarationWriter(SCHEMA_PATH, SCHEMA, filter, options.codegenTSPluginConfig);
+    const WRITER = new DeclarationWriter(
+        SCHEMA_PATH,
+        SCHEMA,
+        filter,
+        options.codegenTSPluginConfig,
+        options.codegenTSOperationsPluginConfig
+    );
 
     const TRANSFORMED_GRAPHQL_FILES = new Set<string>();
 

@@ -171,3 +171,12 @@ Default: `{}`
 Config to pass to the typescript plugin of GraphQL codegen.  
 This allows you to set options like [TS types for scalars](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars).
 See [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference) for a detailed list of options.
+
+### `codegenTSOperationsPluginConfig`
+
+Type: `Object` (see [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference))  
+Default: `{}`
+
+Config to pass to the typescript operations plugin of GraphQL codegen.  
+This allows you to set options like [TS types for scalars](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#scalars).
+See [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference) for a detailed list of options.
