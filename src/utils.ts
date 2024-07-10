@@ -15,7 +15,7 @@ export function loadSchemaDocument(path: string): DocumentNode {
 }
 
 function makeTsPluginConfig(options: GraphQLPluginOptions): TypeScriptPluginConfig {
-    const config = options.codegenTSPluginConfig;
+    const config = options.codegenPluginConfigs?.typescript;
 
     return {
         ...config,
@@ -26,7 +26,7 @@ function makeTsPluginConfig(options: GraphQLPluginOptions): TypeScriptPluginConf
 }
 
 function makeTsOperationsPluginConfig(options: GraphQLPluginOptions): TypeScriptDocumentsPluginConfig {
-    const config = options.codegenTSOperationsPluginConfig;
+    const config = options.codegenPluginConfigs?.typescriptOperations;
 
     return {
         ...config,

@@ -36,22 +36,23 @@ export interface GraphQLPluginOptions {
     generateDeclarations?: boolean;
 
     /**
-     * Config to pass to the TypeScript codegen plugin
-     *
-     * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
-     *
-     * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference)
+     * Configs of GraphQL-Codegen plugins
      */
-    codegenTSPluginConfig?: TypeScriptPluginConfig;
+    codegenPluginConfigs?: {
+        /**
+         * Config to pass to the TypeScript plugin (see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference))
+         *
+         * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
+         */
+        typescript?: TypeScriptPluginConfig;
 
-    /**
-     * Config to pass to the TypeScript operations codegen plugin
-     *
-     * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
-     *
-     * see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference)
-     */
-    codegenTSOperationsPluginConfig?: TypeScriptDocumentsPluginConfig;
+        /**
+         * Config to pass to the TypeScript operations plugin (see [documentation](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#config-api-reference))
+         *
+         * Note: `strictScalars`, `defaultScalarType`, and `scalars` will be overridden by the options in this plugin.
+         */
+        typescriptOperations?: TypeScriptDocumentsPluginConfig;
+    };
 
     /**
      * Makes scalars strict.
