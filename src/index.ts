@@ -1,4 +1,5 @@
 import { normalizePath, createFilter, type Plugin } from 'vite';
+import { resolve } from 'node:path';
 
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches, disableFragmentWarnings } from 'graphql-tag';
@@ -96,7 +97,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     const filter = createFilter(options.include, options.exclude);
     const generateDeclarations = options.generateDeclarations ?? true;
 
-    const SCHEMA_PATH = normalizePath(options?.schemaPath ?? './schema.graphql');
+    const SCHEMA_PATH = resolve(normalizePath(options?.schemaPath ?? './schema.graphql'));
     let SCHEMA: DocumentNode;
 
     function loadSchema() {
@@ -128,8 +129,6 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
         async transform(src, id) {
             if (!EXT.test(id)) return null;
             if (!filter(id)) return null;
-
-            this.addWatchFile(SCHEMA_PATH);
 
             TRANSFORMED_GRAPHQL_FILES.add(id);
 
@@ -166,6 +165,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
                 TRANSFORMED_GRAPHQL_FILES.clear();
 
+                WRITER.schema = SCHEMA;
                 await WRITER.writeDeclarationsForAllGQLFiles();
 
                 server.ws.send({

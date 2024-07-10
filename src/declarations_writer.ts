@@ -1,7 +1,7 @@
 import { writeSchemaDeclarations, writeOperationDeclarations } from './declarations';
 import { Project } from 'ts-morph';
 import glob from 'fast-glob';
-import { dirname, relative } from 'path';
+import { dirname, relative, resolve } from 'path';
 import { createFilter, normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
 import { sep } from 'node:path';
@@ -10,7 +10,7 @@ import type { GraphQLPluginOptions } from '.';
 const MINIMATCH_PATTERNS = ['**/*.gql', '**/*.graphql'];
 
 export class DeclarationWriter {
-    private schema: DocumentNode;
+    public schema: DocumentNode;
     private schemaPath: string;
     private options: GraphQLPluginOptions;
     private schemaExports: string[] = [];
@@ -50,7 +50,7 @@ export class DeclarationWriter {
 
         await Promise.all(
             graphQLFiles.map((path) => {
-                path = normalizePath(path);
+                path = normalizePath(resolve(path));
 
                 if (path === this.schemaPath) return Promise.resolve();
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { resolve } from 'node:path';
 import { normalizePath, loadConfigFromFile, type PluginOption, type Plugin } from 'vite';
 import { DeclarationWriter } from './declarations_writer';
 import { loadSchemaDocument } from './utils';
@@ -77,7 +78,7 @@ const program = new Command();
         exclude: args.exclude ?? viteOptions?.exclude
     };
 
-    const SCHEMA_PATH = normalizePath(options.schemaPath ?? './schema.graphql');
+    const SCHEMA_PATH = normalizePath(resolve(options.schemaPath ?? './schema.graphql'));
 
     const SCHEMA = loadSchemaDocument(SCHEMA_PATH);
 
