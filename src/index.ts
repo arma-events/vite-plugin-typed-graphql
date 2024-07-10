@@ -98,7 +98,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
     const filter = createFilter(options.include, options.exclude);
     const generateDeclarations = options.generateDeclarations ?? true;
 
-    const SCHEMA_PATH = resolve(normalizePath(options?.schemaPath ?? './schema.graphql'));
+    const SCHEMA_PATH = normalizePath(resolve(options?.schemaPath ?? './schema.graphql'));
     let SCHEMA: DocumentNode;
 
     function loadSchema() {
