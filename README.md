@@ -162,16 +162,6 @@ Default: `true`
 
 If `true`, instructs plugin to generate type declaration files next to included `.graphql` / `.gql` files, to allow for type-safe GraphQL queries / mutations.
 
-
-### `codegenPluginConfigs`
-
-Type: `Object` (see [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference))  
-Default: `{}`
-
-Config to pass to the typescript plugin of GraphQL codegen.  
-This allows you to set options like [TS types for scalars](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars).
-See [here](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#config-api-reference) for a detailed list of options.
-
 ### `strictScalars`
 
 Type: `Boolean`  
