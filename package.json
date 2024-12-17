@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-typed-graphql",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Vite Plugin which enables the import of Typed-Document-Nodes directly from `.gql` / `.graphql` files, to allow for type-safe GraphQL implementations.",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
