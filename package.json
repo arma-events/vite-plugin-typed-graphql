@@ -53,7 +53,7 @@
     "@graphql-tools/import": "^7.0.1",
     "@graphql-tools/load": "^8.0.2",
     "commander": "^12.1.0",
-    "esbuild": "^0.21.4",
+    "esbuild": "^0.25.0",
     "fast-glob": "^3.3.2",
     "graphql": "^16.8.1",
     "ts-morph": "^22.0.0"
