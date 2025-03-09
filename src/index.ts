@@ -73,6 +73,24 @@ export interface GraphQLPluginOptions {
      */
     defaultScalarType?: string;
 
+    /* eslint-disable no-irregular-whitespace */
+
+    /**
+     * Header to be added to the generated declaration file for the GraphQL schema.
+     *
+     * @default '/* eslint-disable *​/\n\n'
+     */
+    schemaDeclarationFileHeader?: string;
+
+    /**
+     * Header to be added to the generated declaration file for GraphQL operations.
+     *
+     * @default '/* eslint-disable *​/\n\n'
+     */
+    operationDeclarationFileHeader?: string;
+
+    /* eslint-enable no-irregular-whitespace */
+
     /**
      * Extend or override the built-in scalars and custom GraphQL scalars to a custom type.
      *

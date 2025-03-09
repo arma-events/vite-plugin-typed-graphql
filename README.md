@@ -162,6 +162,20 @@ Default: `true`
 
 If `true`, instructs plugin to generate type declaration files next to included `.graphql` / `.gql` files, to allow for type-safe GraphQL queries / mutations.
 
+### `schemaDeclarationFileHeader`
+
+Type: `String`  
+Default: `'/* eslint-disable */\n\n'`
+
+Header to be added to the generated declaration file for the GraphQL schema.
+
+### `operationDeclarationFileHeader`
+
+Type: `String`  
+Default: `'/* eslint-disable */\n\n'`
+
+Header to be added to the generated declaration file for GraphQL operations.
+
 ### `strictScalars`
 
 Type: `Boolean`  

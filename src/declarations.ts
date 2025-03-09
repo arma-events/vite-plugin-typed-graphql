@@ -37,7 +37,8 @@ export async function writeOperationDeclarations(
         options
     );
 
-    const contents = '/* eslint-disable */\n\n' + schemaImports + typeScript;
+    const contents =
+        (options.operationDeclarationFileHeader ?? '/* eslint-disable */\n\n') + schemaImports + typeScript;
 
     await writeFile(path + '.d.ts', contents, { encoding: 'utf-8' });
 
@@ -62,7 +63,7 @@ export async function writeSchemaDeclarations(
 ) {
     const typeScript = await codegenTypedDocumentNode(schema, undefined, { schema: true }, options);
 
-    const contents = '/* eslint-disable */\n\n' + typeScript;
+    const contents = (options.schemaDeclarationFileHeader ?? '/* eslint-disable */\n\n') + typeScript;
 
     await writeFile(absPath + '.d.ts', contents, { encoding: 'utf-8' });
 
