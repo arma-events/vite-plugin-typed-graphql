@@ -1,5 +1,6 @@
-import { normalizePath, createFilter, type Plugin } from 'vite';
+import { normalizePath, createFilter, type Plugin, type Rollup } from 'vite';
 import { resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
 
 import { loadDocuments } from '@graphql-tools/load';
 import { resetCaches as resetGQLTagCaches, disableFragmentWarnings } from 'graphql-tag';
@@ -14,6 +15,35 @@ import { extractImportLines, parseImportLine } from '@graphql-tools/import';
 const EXT = /\.(gql|graphql)$/;
 
 disableFragmentWarnings();
+
+/**
+ * Register all files `#import`ed by a GraphQL file (recursively) as watch files,
+ * so changes to transitively imported fragments re-trigger the transform.
+ */
+async function addImportsAsWatchFiles(
+    ctx: Pick<Rollup.TransformPluginContext, 'resolve' | 'addWatchFile'>,
+    src: string,
+    id: string,
+    seen = new Set<string>([id])
+): Promise<void> {
+    const { importLines } = extractImportLines(src);
+
+    await Promise.all(
+        importLines.map(async (line) => {
+            let { from } = parseImportLine(line.replace(/^#/, '').trim());
+            from = from.startsWith('./') || from.startsWith('/') ? from : `./${from}`;
+            const importId = await ctx.resolve(from, id);
+            if (importId === null) return;
+            if (seen.has(importId.id)) return;
+            seen.add(importId.id);
+
+            ctx.addWatchFile(importId.id);
+
+            const importedSrc = await readFile(importId.id, 'utf-8');
+            await addImportsAsWatchFiles(ctx, importedSrc, importId.id, seen);
+        })
+    );
+}
 export interface GraphQLPluginOptions {
     /**
      * A [picomatch pattern](https://github.com/micromatch/picomatch), or array of patterns, which
@@ -154,17 +184,7 @@ export default function typedGraphQLPlugin(options: GraphQLPluginOptions = {}): 
 
             resetGQLTagCaches();
 
-            const { importLines } = extractImportLines(src);
-
-            await Promise.all(
-                importLines.map(async (line) => {
-                    let { from } = parseImportLine(line.replace(/^#/, '').trim());
-                    from = from.startsWith('./') || from.startsWith('/') ? from : `./${from}`;
-                    const importId = await this.resolve(from, id);
-                    if (importId === null) return;
-                    this.addWatchFile(importId.id);
-                })
-            );
+            await addImportsAsWatchFiles(this, src, id);
 
             const [doc] = await loadDocuments(id, { loaders: [new GraphQLFileLoader()] });
 
