@@ -48,8 +48,7 @@ describe('writeOperationDeclarations', () => {
         expect(written.startsWith('/* eslint-disable */\n\n')).toBe(true);
         expect(written).toContain('export type User = {');
         expect(written).toContain('export type GetUserQuery = ');
-        expect(written).toContain('export const GetUser = ');
-        expect(written).toContain('as unknown as DocumentNode<GetUserQuery, GetUserQueryVariables>;');
+        expect(written).toContain('export declare const GetUser: DocumentNode<GetUserQuery, GetUserQueryVariables>;');
     });
 
     it('imports schema types instead of inlining them when schema imports are given', async () => {

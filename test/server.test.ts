@@ -85,8 +85,8 @@ describe('vite dev server', () => {
         await hotUpdate(queriesPath);
 
         const dts = await readDts(dir, 'queries.graphql');
-        expect(dts).toContain('export const GetUserById = ');
-        expect(dts).not.toContain('export const GetUser = ');
+        expect(dts).toContain('export declare const GetUserById: DocumentNode<');
+        expect(dts).not.toContain('export declare const GetUser: ');
     });
 
     it('ignores hot updates of files that are not GraphQL files', async () => {

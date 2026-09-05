@@ -54,7 +54,7 @@ describe('vite build', () => {
 
         expect(existsSync(join(dir, 'schema.graphql.d.ts'))).toBe(true);
         expect(existsSync(join(dir, 'fragments.graphql.d.ts'))).toBe(true);
-        expect(await readDts(dir, 'queries.graphql')).toContain('export const GetUser = ');
+        expect(await readDts(dir, 'queries.graphql')).toContain('export declare const GetUser: DocumentNode<');
     });
 
     it('throws a descriptive error when the schema cannot be loaded', () => {

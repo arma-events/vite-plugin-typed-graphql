@@ -5,6 +5,17 @@ import { writeFile } from 'fs/promises';
 import { codegenTypedDocumentNode } from './utils';
 import { GraphQLPluginOptions } from '.';
 
+// `export const Foo = { ...document... } as unknown as DocumentNode<Result, Variables>;`
+const TYPED_DOCUMENT_CONST = /^export const (\w+) = .+ as unknown as (DocumentNode<.+>);$/gm;
+
+/**
+ * Codegen emits typed document nodes as initialized constants, which is invalid in a
+ * declaration file (TS1254). Rewrite them to `export declare const Foo: DocumentNode<...>;`.
+ */
+function toAmbientDeclarations(typeScript: string): string {
+    return typeScript.replace(TYPED_DOCUMENT_CONST, 'export declare const $1: $2;');
+}
+
 /**
  * Write type declarations file (`.d.ts`) for GraphQL operation file.
  *
@@ -38,7 +49,9 @@ export async function writeOperationDeclarations(
     );
 
     const contents =
-        (options.operationDeclarationFileHeader ?? '/* eslint-disable */\n\n') + schemaImports + typeScript;
+        (options.operationDeclarationFileHeader ?? '/* eslint-disable */\n\n') +
+        schemaImports +
+        toAmbientDeclarations(typeScript);
 
     await writeFile(path + '.d.ts', contents, { encoding: 'utf-8' });
 
