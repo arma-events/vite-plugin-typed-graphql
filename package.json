@@ -29,6 +29,7 @@
     "email": "derzade@gmail.com"
   },
   "scripts": {
+    "type-check": "tsc --noEmit",
     "build": "unbuild",
     "lint": "eslint ./src",
     "fmt": "prettier --write .",
