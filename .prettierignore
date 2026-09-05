@@ -2,3 +2,5 @@ dist
 package.json
 package-lock.json
 README.md
+test/.tmp
+test/snapshots

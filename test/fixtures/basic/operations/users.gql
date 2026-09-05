@@ -1,0 +1,20 @@
+#import FullUser from '../fragments/FullUser.graphql'
+
+query GetFullUser($id: ID!) {
+    user(id: $id) {
+        ...FullUser
+    }
+}
+
+mutation RenameUser($id: ID!, $name: String!) {
+    renameUser(id: $id, name: $name) {
+        ...FullUser
+    }
+}
+
+subscription UserChanged($id: ID!) {
+    userChanged(id: $id) {
+        id
+        name
+    }
+}

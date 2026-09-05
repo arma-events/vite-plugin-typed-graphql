@@ -75,3 +75,32 @@ jobs:
 
             - name: Build app
               run: npm run-script build
+
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                # 'default' runs against the root `vite` dependency and is the only entry
+                # that also exercises the CLI (see test/cli.test.ts and vitest.config.ts)
+                vite: ['default', '4', '5', '6', '7', '8']
+                include:
+                    - vite: '8'
+                      experimental: true
+        continue-on-error: ${{ matrix.experimental == true }}
+        name: test (vite ${{ matrix.vite }})
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci --ignore-scripts
+
+            - name: Run tests
+              run: npm test
+              env:
+                  VITE_VERSION: ${{ matrix.vite != 'default' && matrix.vite || '' }}

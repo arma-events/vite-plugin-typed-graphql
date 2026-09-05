@@ -1,0 +1,10 @@
+#import UserFields from '../fragments.graphql'
+#import PostFields from './PostFields.graphql'
+
+fragment FullUser on User {
+    ...UserFields
+    role
+    posts {
+        ...PostFields
+    }
+}

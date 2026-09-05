@@ -7,12 +7,15 @@ export default defineConfig([
     {
         files: ['**/*.{js,ts}']
     },
+    {
+        ignores: ['test/.tmp/**', 'test/snapshots/**']
+    },
     js.configs.recommended,
     tseslint.configs.recommended,
     prettierRecommended,
     {
         rules: {
-            'no-console': 'warn',
+            'no-console': 'warn'
         }
     }
 ]);

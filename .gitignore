@@ -1,2 +1,4 @@
 node_modules/
 dist/
+test/.tmp/
+test/fixtures/**/*.graphql.d.ts

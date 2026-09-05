@@ -1,0 +1,5 @@
+query SkippedUser($id: ID!) {
+    user(id: $id) {
+        id
+    }
+}

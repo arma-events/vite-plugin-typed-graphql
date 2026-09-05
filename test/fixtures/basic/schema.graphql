@@ -1,0 +1,31 @@
+scalar DateTime
+
+enum Role {
+    ADMIN
+    USER
+}
+
+type Post {
+    id: ID!
+    title: String!
+}
+
+type User {
+    id: ID!
+    name: String!
+    role: Role!
+    createdAt: DateTime!
+    posts: [Post!]!
+}
+
+type Query {
+    user(id: ID!): User
+}
+
+type Mutation {
+    renameUser(id: ID!, name: String!): User
+}
+
+type Subscription {
+    userChanged(id: ID!): User
+}
