@@ -14,7 +14,7 @@ let cleanup: () => Promise<void>;
 
 // The built CLI imports whatever `vite` is installed at the root, so it cannot
 // be run against an aliased Vite copy (see vitest.config.ts).
-describe.skipIf(process.env.VITE_VERSION !== undefined)('build-gql-declarations CLI', () => {
+describe.skipIf(!!process.env.VITE_VERSION)('build-gql-declarations CLI', () => {
     beforeAll(() => {
         if (!existsSync(BIN)) throw new Error(`${BIN} does not exist, run "npm run build" first`);
     });

@@ -5,5 +5,5 @@ import { version } from 'vite';
 // the whole matrix would test the root `vite` and this test would fail.
 it(`runs against vite ${version}`, () => {
     const expected = process.env.VITE_VERSION;
-    if (expected !== undefined) expect(version.split('.')[0]).toBe(expected);
+    if (expected) expect(version.split('.')[0]).toBe(expected);
 });
