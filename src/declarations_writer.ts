@@ -24,7 +24,11 @@ export class DeclarationWriter {
     }
 
     public async writeOperationDeclarations(path: string) {
-        const schemaPath = relative(dirname(path), this.schemaPath).split(sep).join('/');
+        let schemaPath = relative(dirname(path), this.schemaPath).split(sep).join('/');
+
+        // `relative` yields a bare specifier for siblings (e.g. `schema.graphql`), which
+        // TypeScript would resolve as a package import
+        if (!schemaPath.startsWith('.')) schemaPath = `./${schemaPath}`;
 
         await writeOperationDeclarations(
             path,
