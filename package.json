@@ -30,6 +30,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "bugs": {
     "url": "https://github.com/arma-events/vite-plugin-typed-graphql/issues",
     "email": "derzade@gmail.com"
