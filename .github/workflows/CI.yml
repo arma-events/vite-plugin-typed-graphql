@@ -83,7 +83,7 @@ jobs:
             matrix:
                 # 'default' runs against the root `vite` dependency and is the only entry
                 # that also exercises the CLI (see test/cli.test.ts and vitest.config.ts)
-                vite: ['default', '4', '5', '6', '7', '8']
+                vite: ['default', '6', '7', '8']
                 include:
                     - vite: '8'
                       experimental: true
