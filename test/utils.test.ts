@@ -90,18 +90,19 @@ describe('codegenPluginConfigs passthrough', () => {
 
     it('passes typescript-operations plugin options through', async () => {
         const [doc] = await loadDocuments(join(FIXTURE, 'queries.graphql'), { loaders: [new GraphQLFileLoader()] });
-        const withTypename = await codegenTypedDocumentNode(schema, doc, { operation: true });
-        const withoutTypename = await codegenTypedDocumentNode(
+        const withoutTypename = await codegenTypedDocumentNode(schema, doc, { operation: true });
+        const withTypename = await codegenTypedDocumentNode(
             schema,
             doc,
             { operation: true },
             {
-                codegenPluginConfigs: { typescriptOperations: { skipTypename: true } }
+                codegenPluginConfigs: { typescriptOperations: { nonOptionalTypename: true } }
             }
         );
 
-        expect(withTypename).toContain('__typename');
-        expect(withoutTypename).not.toContain('__typename');
+        // note the colon: the `Incremental` helper type mentions the bare string `'__typename'` in every file
+        expect(withoutTypename).not.toContain('__typename:');
+        expect(withTypename).toContain("__typename: 'User'");
     });
 });
 

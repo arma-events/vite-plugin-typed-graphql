@@ -25,7 +25,8 @@ function toAmbientDeclarations(typeScript: string): string {
  * @param path Path to GraphQL file
  * @param schema GraphQL Schema
  * @param options Plugin options (will be used to calculate config for codegen plugins)
- * @param schemaImports Imports from schema file (this will disable codegen for schema file)
+ * @param schemaImportPath Module specifier of the schema declarations relative to `path`. If given,
+ *                         enums are imported from there instead of being redeclared.
  * @returns Contents of written file
  */
 
@@ -33,25 +34,20 @@ export async function writeOperationDeclarations(
     path: string,
     schema: DocumentNode,
     options: GraphQLPluginOptions = {},
-    schemaImports = ''
+    schemaImportPath?: string
 ) {
     const [doc] = await loadDocuments(path, { loaders: [new GraphQLFileLoader()] });
 
     const typeScript = await codegenTypedDocumentNode(
         schema,
         doc,
-        {
-            operation: true,
-            schema: schemaImports === '',
-            typedDocNode: true
-        },
-        options
+        { operation: true, typedDocNode: true },
+        options,
+        schemaImportPath
     );
 
     const contents =
-        (options.operationDeclarationFileHeader ?? '/* eslint-disable */\n\n') +
-        schemaImports +
-        toAmbientDeclarations(typeScript);
+        (options.operationDeclarationFileHeader ?? '/* eslint-disable */\n\n') + toAmbientDeclarations(typeScript);
 
     await writeFile(path + '.d.ts', contents, { encoding: 'utf-8' });
 

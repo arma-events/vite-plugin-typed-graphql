@@ -2,7 +2,7 @@ import * as typescriptPlugin from '@graphql-codegen/typescript';
 import * as typescriptOperationPlugin from '@graphql-codegen/typescript-operations';
 import * as typedDocumentNodePlugin from '@graphql-codegen/typed-document-node';
 import { transform } from 'esbuild';
-import { parse, DocumentNode } from 'graphql';
+import { parse, DocumentNode, Kind } from 'graphql';
 import { readFileSync } from 'fs';
 import { codegen } from '@graphql-codegen/core';
 import { Types } from '@graphql-codegen/plugin-helpers';
@@ -25,11 +25,28 @@ function makeTsPluginConfig(options: GraphQLPluginOptions): TypeScriptPluginConf
     };
 }
 
-function makeTsOperationsPluginConfig(options: GraphQLPluginOptions): TypeScriptDocumentsPluginConfig {
+/**
+ * Map every enum of the schema to the schema declarations file, so operation declarations
+ * import the enums from there instead of redeclaring them.
+ */
+function schemaEnumValues(schema: DocumentNode, schemaImportPath: string): Record<string, string> {
+    const enumNames = schema.definitions
+        .filter((def) => def.kind === Kind.ENUM_TYPE_DEFINITION || def.kind === Kind.ENUM_TYPE_EXTENSION)
+        .map((def) => def.name.value);
+
+    return Object.fromEntries(enumNames.map((name) => [name, `${schemaImportPath}#${name}`]));
+}
+
+function makeTsOperationsPluginConfig(
+    options: GraphQLPluginOptions,
+    schema: DocumentNode,
+    schemaImportPath?: string
+): TypeScriptDocumentsPluginConfig {
     const config = options.codegenPluginConfigs?.typescriptOperations;
 
     return {
         ...config,
+        enumValues: config?.enumValues ?? (schemaImportPath ? schemaEnumValues(schema, schemaImportPath) : undefined),
         defaultScalarType: options.defaultScalarType ?? config?.defaultScalarType ?? 'unknown',
         strictScalars: options.strictScalars ?? config?.strictScalars ?? false,
         scalars: options.scalars ?? config?.scalars ?? {}
@@ -44,12 +61,16 @@ export async function codegenTypedDocumentNode(
         operation?: boolean;
         typedDocNode?: boolean;
     } = { schema: true, operation: true, typedDocNode: true },
-    options: GraphQLPluginOptions = {}
+    options: GraphQLPluginOptions = {},
+    schemaImportPath?: string
 ): Promise<string> {
     const configuredPlugins: Types.ConfiguredPlugin[] = [];
 
     if (plugins.schema) configuredPlugins.push({ typescript: makeTsPluginConfig(options) });
-    if (plugins.operation) configuredPlugins.push({ typescriptOperations: makeTsOperationsPluginConfig(options) });
+    if (plugins.operation)
+        configuredPlugins.push({
+            typescriptOperations: makeTsOperationsPluginConfig(options, schema, schemaImportPath)
+        });
     if (plugins.typedDocNode) configuredPlugins.push({ typedDocumentNode: {} });
 
     const ts = await codegen({

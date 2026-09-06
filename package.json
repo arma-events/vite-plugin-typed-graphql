@@ -48,18 +48,17 @@
   "author": "Jonas Schade <derzade@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@graphql-codegen/core": "^4.0.2",
-    "@graphql-codegen/typed-document-node": "^5.0.7",
-    "@graphql-codegen/typescript": "^4.0.7",
-    "@graphql-codegen/typescript-operations": "^4.2.1",
+    "@graphql-codegen/core": "^6.2.0",
+    "@graphql-codegen/typed-document-node": "^7.1.0",
+    "@graphql-codegen/typescript": "^6.1.0",
+    "@graphql-codegen/typescript-operations": "^6.1.6",
     "@graphql-tools/graphql-file-loader": "^8.1.19",
     "@graphql-tools/import": "^7.1.19",
     "@graphql-tools/load": "^8.1.16",
     "commander": "^15.0.0",
     "esbuild": "^0.25.0 || ^0.27.0 || ^0.28.0",
     "fast-glob": "^3.3.3",
-    "graphql": "^16.8.1",
-    "ts-morph": "^22.0.0"
+    "graphql": "^16.8.1 || ^17.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

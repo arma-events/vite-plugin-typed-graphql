@@ -1,52 +1,40 @@
 /* eslint-disable */
 
-import {
-  Maybe,
-  InputMaybe,
-  Exact,
-  MakeOptional,
-  MakeMaybe,
-  MakeEmpty,
-  Incremental,
-  Scalars,
-  Role,
-  Post,
-  User,
-  Query,
-  QueryUserArgs,
-  Mutation,
-  MutationRenameUserArgs,
-  Subscription,
-  SubscriptionUserChangedArgs
-} from '../schema.graphql';
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+import { Role } from '../schema.graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+export { Role };
+
 export type GetFullUserQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type GetFullUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', role: Role, id: string, name: string, posts: Array<{ __typename?: 'Post', id: string, title: string }> } | null };
+export type GetFullUserQuery = { user: { role: Role, id: string, name: string, posts: Array<{ id: string, title: string }> } | null };
 
-export type FullUserFragment = { __typename?: 'User', role: Role, id: string, name: string, posts: Array<{ __typename?: 'Post', id: string, title: string }> };
+export type FullUserFragment = { role: Role, id: string, name: string, posts: Array<{ id: string, title: string }> };
 
-export type UserFieldsFragment = { __typename?: 'User', id: string, name: string };
+export type UserFieldsFragment = { id: string, name: string };
 
-export type PostFieldsFragment = { __typename?: 'Post', id: string, title: string };
+export type PostFieldsFragment = { id: string, title: string };
 
 export type RenameUserMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
+  id: string | number;
+  name: string;
 }>;
 
 
-export type RenameUserMutation = { __typename?: 'Mutation', renameUser?: { __typename?: 'User', role: Role, id: string, name: string, posts: Array<{ __typename?: 'Post', id: string, title: string }> } | null };
+export type RenameUserMutation = { renameUser: { role: Role, id: string, name: string, posts: Array<{ id: string, title: string }> } | null };
 
 export type UserChangedSubscriptionVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type UserChangedSubscription = { __typename?: 'Subscription', userChanged?: { __typename?: 'User', id: string, name: string } | null };
+export type UserChangedSubscription = { userChanged: { id: string, name: string } | null };
 
 export declare const UserFields: DocumentNode<UserFieldsFragment, unknown>;
 export declare const PostFields: DocumentNode<PostFieldsFragment, unknown>;

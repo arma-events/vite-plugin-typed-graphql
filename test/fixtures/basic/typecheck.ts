@@ -7,8 +7,8 @@ import { GetFullUser, RenameUser, UserChanged } from './operations/users.gql';
 import { Role } from './schema.graphql';
 
 export const getUserVariables: VariablesOf<typeof GetUser> = { id: '1' };
-// @ts-expect-error `id` must be a string
-export const wrongGetUserVariables: VariablesOf<typeof GetUser> = { id: 1 };
+// @ts-expect-error `id` must be a string or number
+export const wrongGetUserVariables: VariablesOf<typeof GetUser> = { id: true };
 // @ts-expect-error `name` is required
 export const missingRenameUserVariables: VariablesOf<typeof RenameUser> = { id: '1' };
 

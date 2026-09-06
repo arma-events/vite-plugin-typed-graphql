@@ -41,24 +41,24 @@ describe('writeSchemaDeclarations', () => {
 describe('writeOperationDeclarations', () => {
     const queries = () => join(dir, 'queries.graphql');
 
-    it('inlines schema types when no schema imports are given', async () => {
+    it('writes self-contained operation types without the schema types', async () => {
         await writeOperationDeclarations(queries(), schema);
         const written = await readDts(dir, 'queries.graphql');
 
         expect(written.startsWith('/* eslint-disable */\n\n')).toBe(true);
-        expect(written).toContain('export type User = {');
         expect(written).toContain('export type GetUserQuery = ');
         expect(written).toContain('export declare const GetUser: DocumentNode<GetUserQuery, GetUserQueryVariables>;');
+        expect(written).not.toContain('export type User = {');
+        expect(written).not.toContain("from './schema.graphql'");
     });
 
-    it('imports schema types instead of inlining them when schema imports are given', async () => {
-        const imports = "import { Scalars, User } from './schema.graphql';\n";
-        await writeOperationDeclarations(queries(), schema, {}, imports);
-        const written = await readDts(dir, 'queries.graphql');
+    it('imports enums from the schema declarations when a schema import path is given', async () => {
+        const users = join(dir, 'operations', 'users.gql');
+        await writeOperationDeclarations(users, schema, {}, '../schema.graphql');
+        const written = await readDts(dir, 'operations/users.gql');
 
-        expect(written).toContain(imports);
-        expect(written).not.toContain('export type User = {');
-        expect(written).toContain('export type GetUserQuery = ');
+        expect(written).toContain("import { Role } from '../schema.graphql';");
+        expect(written).not.toContain('export type Role =');
     });
 
     it('honours operationDeclarationFileHeader', async () => {
@@ -80,7 +80,6 @@ describe('DeclarationWriter.writeDeclarationsForAllGQLFiles', () => {
         // the schema must not be treated as an operation file
         expect(existsSync(join(dir, 'schema.graphql.d.ts.d.ts'))).toBe(false);
 
-        // operation files import the schema types instead of inlining them
         await expect(await readDts(dir, 'queries.graphql')).toMatchFileSnapshot('./snapshots/queries.graphql.d.ts');
         await expect(await readDts(dir, 'fragments.graphql')).toMatchFileSnapshot('./snapshots/fragments.graphql.d.ts');
     });
@@ -89,10 +88,10 @@ describe('DeclarationWriter.writeDeclarationsForAllGQLFiles', () => {
         const writer = new DeclarationWriter(schemaPath, schema);
         await withCwd(dir, () => writer.writeDeclarationsForAllGQLFiles());
 
-        expect(await readDts(dir, 'queries.graphql')).toContain("from './schema.graphql';");
+        expect(await readDts(dir, 'operations/users.gql')).toContain("from '../schema.graphql';");
     });
 
-    it('uses a relative path to the schema for nested operation files', async () => {
+    it('writes declarations for nested operation files', async () => {
         const writer = new DeclarationWriter(schemaPath, schema);
         await withCwd(dir, () => writer.writeDeclarationsForAllGQLFiles());
 

@@ -1,25 +1,8 @@
 /* eslint-disable */
 
-import {
-  Maybe,
-  InputMaybe,
-  Exact,
-  MakeOptional,
-  MakeMaybe,
-  MakeEmpty,
-  Incremental,
-  Scalars,
-  Role,
-  Post,
-  User,
-  Query,
-  QueryUserArgs,
-  Mutation,
-  MutationRenameUserArgs,
-  Subscription,
-  SubscriptionUserChangedArgs
-} from './schema.graphql';
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type UserFieldsFragment = { __typename?: 'User', id: string, name: string };
+export type UserFieldsFragment = { id: string, name: string };
 
 export declare const UserFields: DocumentNode<UserFieldsFragment, unknown>;

@@ -1,31 +1,16 @@
 /* eslint-disable */
 
-import {
-  Maybe,
-  InputMaybe,
-  Exact,
-  MakeOptional,
-  MakeMaybe,
-  MakeEmpty,
-  Incremental,
-  Scalars,
-  Role,
-  Post,
-  User,
-  Query,
-  QueryUserArgs,
-  Mutation,
-  MutationRenameUserArgs,
-  Subscription,
-  SubscriptionUserChangedArgs
-} from '../schema.graphql';
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type SkippedUserQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type SkippedUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string } | null };
+export type SkippedUserQuery = { user: { id: string } | null };
 
 
 export declare const SkippedUser: DocumentNode<SkippedUserQuery, SkippedUserQueryVariables>;
