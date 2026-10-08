@@ -1,5 +1,5 @@
 import { writeSchemaDeclarations, writeOperationDeclarations } from './declarations';
-import glob from 'fast-glob';
+import { glob } from 'tinyglobby';
 import { dirname, relative, resolve, sep } from 'path';
 import { createFilter, normalizePath } from 'vite';
 import { DocumentNode } from 'graphql';
