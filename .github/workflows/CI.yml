@@ -81,14 +81,9 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # 'default' runs against the root `vite` dependency and is the only entry
-                # that also exercises the CLI (see test/cli.test.ts and vitest.config.ts)
-                vite: ['default', '6', '7', '8']
-                include:
-                    - vite: '8'
-                      experimental: true
-        continue-on-error: ${{ matrix.experimental == true }}
-        name: test (vite ${{ matrix.vite }})
+                # one vitest project per vite major plus the CLI, see vitest.config.ts
+                project: ['vite6', 'vite7', 'vite8', 'cli']
+        name: test (${{ matrix.project }})
         steps:
             - uses: actions/checkout@v4
 
@@ -101,6 +96,4 @@ jobs:
               run: npm ci --ignore-scripts
 
             - name: Run tests
-              run: npm test
-              env:
-                  VITE_VERSION: ${{ matrix.vite != 'default' && matrix.vite || '' }}
+              run: npm test -- --project ${{ matrix.project }}
