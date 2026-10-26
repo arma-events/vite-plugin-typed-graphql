@@ -61,7 +61,7 @@
     "@graphql-codegen/typed-document-node": "^7.1.1",
     "@graphql-codegen/typescript": "^6.1.1",
     "@graphql-codegen/typescript-operations": "^6.1.10",
-    "@graphql-tools/graphql-file-loader": "^8.1.22",
+    "@graphql-tools/graphql-file-loader": "^9.0.6",
     "@graphql-tools/import": "^7.2.2",
     "@graphql-tools/load": "^9.0.4",
     "commander": "^15.0.0",
